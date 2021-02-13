@@ -1,0 +1,118 @@
+*{
+	outline: none;
+	font-family: "Helvetica Neue",Helvetica,"Segoe UI",Tahoma,Arial,sans-serif;
+	color: white;
+}
+html{
+	height: 100%;
+	width: 100%;
+}
+body{
+	margin:0;
+	background: url("static/login-bg.jpg") no-repeat center;
+	background-size: cover;
+	height: 100%;
+	width: 100%;
+}
+#root{
+	height: 100%;
+	width: 100%;
+	background: linear-gradient(to top,rgba(0, 0, 0, 0.5) 0%,rgba(0, 0, 0, 0.5) 60%);
+}
+header{
+	height: 70px;
+	padding: 60px 0 0 0;
+	text-align: center;
+	font-size: 42px;
+}
+main{
+	width: 100%;
+	height: calc(100% - 230px);
+}
+footer{
+	position: fixed;
+	padding: 40px 0;
+	width: 100%;
+	bottom: 0;
+	text-align: center;
+	color:rgb(180,180,180);
+}
+.container{
+	position: absolute;
+	width: 80%;
+	max-width: 380px;
+	height: 80%;
+	max-height: 330px;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+.flex{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.flex_row{
+	flex-direction: row;
+}
+.flex_column{
+	flex-direction: column;
+}
+.flex_row > *{
+	height: 100%;
+}
+.flex_column > *{
+	width: 100%;
+}
+.flex_column > *{
+	display: block;
+}
+.flex_row > *{
+	display: inline-block;
+}
+.container_part{
+	margin: 15px 0;
+	flex: 0.3
+}
+input[type=email], input[type=password]{
+	background-color: lightgray;
+	font-size: 18px;
+	padding-left: 30px;
+	width: calc(100% - 30px);
+	color: rgb(30, 30, 30);
+}
+input[type=submit]{
+	text-align: center;
+	letter-spacing: 1px;
+	background-color: rgb(30,100,250);
+}
+input{
+	border-radius: 20px;
+	border: 0;
+}
+input::placeholder{
+	color: rgb(60, 60, 60);
+}
+input[type=submit]:hover{
+	background-color: rgb(50, 120, 255);
+}
+input[type=submit]:active{
+	background-color: rgb(60, 130, 255);
+}
+a,a:visited{
+	color: rgb(160, 160, 160);
+	text-decoration: none;
+}
+@media screen and (max-width: 480px) {
+	header{
+		font-size: 38px;
+	}
+}
+@media screen and (max-width: 375px) {
+	header{
+		font-size: 28px;
+	}
+	footer{
+		font-size: 13px;
+	}
+}
