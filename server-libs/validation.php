@@ -1,5 +1,5 @@
 <?php
-	require_once("server-libs/db.php");
+	require_once(__DIR__."/db.php");
 
 	class Validation{
 		private static $emailPattern = "/^[a-zA-Z0-9,.-_]{2,15}@[a-zA-Z0-9,.-_]{2,15}\\.[a-zA-Z]{2,10}$/";
@@ -12,6 +12,36 @@
 
 		public static function validPassword(string $password){
 			return preg_match(self::$passwordPattern, $password);
+		}
+
+		public static function getCallByUserSID(string $sid){
+			if(self::$db === null){
+				self::$db = new DBConnection();
+			}
+
+			$call_rows = self::$db->select("calls", array(
+				":caller_session_id" => $sid
+			));
+			if(count($call_rows) > 0){
+				return $call_rows;
+			}else{
+				return false;
+			}
+		}
+
+		public static function getCallByDispatcherEmail(string $email){
+			if(self::$db === null){
+				self::$db = new DBConnection();
+			}
+
+			$call_rows = self::$db->select("calls", array(
+				":dispatcher_email" => $email
+			));
+			if(count($call_rows) > 0){
+				return $call_rows;
+			}else{
+				return false;
+			}
 		}
 
 		public static function getUser(string $email){

@@ -4,8 +4,8 @@
 	transition: all 0.1s ease-in-out;
 }
 html{
-	height:100%;
-	width:100%;
+	height:100vh;
+	width:100vw;
 }
 body{
 	margin:0;
@@ -118,21 +118,30 @@ main{
 .responsive_icon{
 	font-size: 30px;
 }
-.round_button:hover{
+.round_button:not([disabled]):hover{
 	filter: brightness(110%);
 }
-.round_button:active{
+.round_button:not([disabled]):active{
 	filter: brightness(120%);
 	transform: translateY(-10px);
 }
+button:disabled{
+	transform:none;
+	filter:brightness(70%);
+}
 #mute_button{
 	background-color: rgba(255,255,255,0);
-	opacity: 0.4;
 	font-size:17px;
 	padding: 10px;
 	border: 0;
 	letter-spacing: 1px;
 	font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+.unmuted{
+	opacity: 0.4;
+}
+.muted{
+	opacity: 0.8;
 }
 .align_flex_end{
 	align-items:flex-end;

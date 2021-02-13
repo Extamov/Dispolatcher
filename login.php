@@ -1,6 +1,6 @@
 <?php
-	require_once("server-libs/website.php");
-	require_once("server-libs/validation.php");
+	require_once(__DIR__."/server-libs/website.php");
+	require_once(__DIR__."/server-libs/validation.php");
 
 	session_start();
 

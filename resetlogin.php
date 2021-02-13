@@ -1,6 +1,8 @@
 <?php
-	require_once("server-libs/website.php");
-	require_once("server-libs/db.php");
+	require_once(__DIR__."/server-libs/website.php");
+	require_once(__DIR__."/server-libs/db.php");
+
+	session_start();
 
 	$db = new DBConnection();
 

@@ -10,7 +10,7 @@
 			$this->db_con = null;
 		}
 
-		function select(string $table_name, array $where_dict, string $where_conditions = ""){
+		function select(string $table_name, array $where_dict = array(), string $where_conditions = ""){
 			$sql_query_values = "";
 
 			$where_conditions_arr = explode(" ", $where_conditions);
@@ -32,8 +32,11 @@
 				}
 			}
 
-
-			$sql = sprintf("SELECT * FROM `%s` WHERE %s", $table_name, $sql_query_values);
+			if(count($where_dict) == 0){
+				$sql = sprintf("SELECT * FROM `%s`", $table_name);
+			}else{
+				$sql = sprintf("SELECT * FROM `%s` WHERE %s", $table_name, $sql_query_values);
+			}
 
 			$statement = $this->db_con->prepare($sql);
 
@@ -98,7 +101,7 @@
 
 			$statement = $this->db_con->prepare($sql);
 
-			$statement->execute($where_dict);
+			$statement->execute(array_merge($where_dict, $data_dict));
 
 			return $statement->fetchAll();
 		}
