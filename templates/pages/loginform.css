@@ -2,6 +2,7 @@
 	outline: none;
 	font-family: "Helvetica Neue",Helvetica,"Segoe UI",Tahoma,Arial,sans-serif;
 	color: white;
+	transition: all 0.2s;
 }
 html{
 	height: 100%;
@@ -40,9 +41,9 @@ footer{
 .container{
 	position: absolute;
 	width: 80%;
-	max-width: 380px;
+	max-width: 580px;
 	height: 80%;
-	max-height: 330px;
+	max-height: 350px;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
@@ -94,10 +95,10 @@ input::placeholder{
 	color: rgb(60, 60, 60);
 }
 input[type=submit]:hover{
-	background-color: rgb(50, 120, 255);
+	filter: brightness(110%);
 }
 input[type=submit]:active{
-	background-color: rgb(60, 130, 255);
+	filter: brightness(120%);
 }
 a,a:visited{
 	color: rgb(160, 160, 160);
@@ -108,11 +109,19 @@ a,a:visited{
 		font-size: 38px;
 	}
 }
-@media screen and (max-width: 375px) {
+@media screen and (max-width: 420px) {
 	header{
 		font-size: 28px;
 	}
 	footer{
 		font-size: 13px;
+	}
+}
+@media screen and (max-width: 310px) {
+	header{
+		font-size: 23px;
+	}
+	footer{
+		font-size: 10px;
 	}
 }
