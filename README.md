@@ -1,8 +1,9 @@
-# # Dispolatcher
+# Dispolatcher
 
 ## Description
 
-A system for police dispatchers.
+A system for police dispatchers based on WEB and backended by PHP on Apache web server.
+
 The system contains 2 parts, 1 for a caller to call and one for the dispatcher to answer.
 
 ## Requirements
