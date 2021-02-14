@@ -237,3 +237,35 @@ button:disabled{
 		padding: 18px;
 	}
 }
+
+@media screen and (max-height: 480px){
+	.flex_responsive{
+		flex-direction: row;
+	}
+	.flex_responsive > *{
+		height: 100%;
+		display: inline-block;
+		align-items: center;
+		align-content: center;
+		justify-content: center;
+		text-align: center;
+		flex: 1;
+	}
+	.flex{
+		display: flex;
+		align-items: center;
+		align-content: center;
+		justify-content: center;
+		text-align: center;
+	}
+	#police_logo{
+		flex: 0;
+	}
+	#police_logo > img{
+		height:0px;
+		width:0px;
+	}
+	.align_flex_end{
+		align-items: center;
+	}
+}

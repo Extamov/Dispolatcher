@@ -39,6 +39,11 @@
 		}
 	}
 
+	$call_rows = Validation::getCallsByIP($ip);
+	if(count($call_rows) >= 5){
+		die("false");
+	}
+
 	$db->insert("calls", array(
 		":id" => randomStr(12),
 		":caller_session_id" => $session_id,

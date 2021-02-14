@@ -13,7 +13,7 @@
 				<span id="login_text">Login</span>
 			</a>
 		</header>
-		<main class="flex flex_column">
+		<main class="flex flex_column flex_responsive">
 			<div class="flex flex_column">
 				<div class="flex" id="inside_header" class="flex">Emergency Services</div>
 				<div class="flex" style="display:none;" id="police_logo"><img width="150" src="static/policeman.svg"></div>
@@ -93,11 +93,13 @@
 
 			var dialing_sound = new Audio("static/calling.webm");
 			dialing_sound.loop = true;
-			var hangup_sound = new Audio("static/hangup.webm");
+			var hold_sound = new Audio("static/hold.opus");
+			hold_sound.loop = true;
+			var hangup_sound = new Audio("static/hangup.opus");
 
 			document.querySelector("#call_button").onclick = async (event) => {
 				if(document.querySelector("#call_button")){
-					document.querySelector("#call_button").disabled = true;
+					try{document.querySelector("#call_button").id = "hangup_button";}catch{}
 
 					var call_header = document.querySelector("#inside_header");
 					var call_type = document.querySelector("#select_type").value;
@@ -109,7 +111,7 @@
 						localStream.getTracks().forEach(track => rtc_connection.addTrack(track, localStream));
 					}catch{
 						alert("You must enable microphone access in order to call.");
-						document.querySelector("#call_button").disabled = false;
+						try{document.querySelector("#hangup_button").id = "call_button";}catch{}
 						return;
 					}
 
@@ -143,6 +145,7 @@
 					}
 
 					call_header.innerHTML = "Calling...";
+					dialing_sound.currentTime = 0;
 					dialing_sound.play();
 
 					rtc_answer = await wait_for_answer();
@@ -184,7 +187,7 @@
 									received_candidates.forEach(candidate => {
 										rtc_connection.addIceCandidate(candidate);
 									});
-									dialing_sound.pause();
+									hold_sound.pause();
 
 									function checkStatus(disconnect_timeout){
 										if(rtc_connection.iceConnectionState == "connected" && !isConnectedStyle()){
@@ -227,6 +230,9 @@
 						}
 					}
 
+					dialing_sound.pause();
+					hold_sound.currentTime = 0;
+					hold_sound.play();
 					send_candidates();
 
 					call_header.innerHTML = "Exchanging";
@@ -265,9 +271,14 @@
 
 				function disconnectCall(message = "Disconnected"){
 					var call_header = document.querySelector("#inside_header");
-					call_header.innerHTML = message;
+
+					if(call_header.innerHTML != "Disconnected"){
+						call_header.innerHTML = message;
+						hangup_sound.play();
+					}
+
 					dialing_sound.pause();
-					hangup_sound.play();
+					hold_sound.pause();
 					ajax("api/close_call.php", "POST", {});
 					setTimeout(() => {
 						call_header.innerHTML = "Emergency Services";
@@ -282,8 +293,10 @@
 						document.querySelector("#mute_button").classList.remove("muted");
 						document.querySelector("#mute_button").classList.add("unmuted");
 					}, 2000);
-					rtc_connection.close();
-					rtc_connection = null;
+					if(rtc_connection){
+						rtc_connection.close();
+						rtc_connection = null;
+					}
 					if(localStream){
 						localStream.getTracks().forEach(function(track) {
 							track.stop();

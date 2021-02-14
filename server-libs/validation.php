@@ -29,6 +29,21 @@
 			}
 		}
 
+		public static function getCallsByIP(string $ip){
+			if(self::$db === null){
+				self::$db = new DBConnection();
+			}
+
+			$call_rows = self::$db->select("calls", array(
+				":caller_ip" => $ip
+			));
+			if(count($call_rows) > 0){
+				return $call_rows;
+			}else{
+				return false;
+			}
+		}
+
 		public static function getCallByDispatcherEmail(string $email){
 			if(self::$db === null){
 				self::$db = new DBConnection();

@@ -170,16 +170,7 @@ button, input{
 .negative_button{
 	background-color: rgb(160, 50, 50);
 }
-.neutral_button{
-	background-color: rgb(110,110,110);
-}
-.positive_button:hover{
-	filter: brightness(110%);
-}
-.negative_button:hover{
-	filter: brightness(110%);
-}
-.neutral_button:hover{
+.positive_button:hover, .negative_button:hover{
 	filter: brightness(110%);
 }
 #nav_button_block{

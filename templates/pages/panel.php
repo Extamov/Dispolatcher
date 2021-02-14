@@ -48,7 +48,6 @@
 						<div class="s-table_footer">
 							<a class="positive_button" href="#">Loading...</a>
 							<a class="negative_button" href="#">Loading...</a>
-							<a class="neutral_button" href="#">Loading...</a>
 						</div>
 					</div>
 				</div>
@@ -119,7 +118,7 @@
 			}
 
 			const navs = ["call", "dispatch", "admin", "settings"];
-			var hangup_sound = new Audio("static/hangup.webm");
+			var hangup_sound = new Audio("static/hangup.opus");
 
 			function nav_responsive(responsive = null) {
 				var main = document.querySelector("main");
@@ -204,7 +203,6 @@
 						<div class="s-table_footer">
 							<a class="positive_button" href="#" onclick="answerCall('${call["id"]}');">Accept</a>
 							<a class="negative_button" href="#" onclick="denyCall('${call["id"]}');">Deny</a>
-							<a class="neutral_button" href="#" onclick="ignoreCall('${call["id"]}');">Ignore</a>
 						</div>
 					</div>
 					`;
@@ -240,12 +238,22 @@
 			}
 
 			function denyCall(id){
+				if(rtc_connection){
+					alert("You can't deny a call while in a call.");
+					return;
+				}
+
 				ajax("api/close_call.php", "POST", {
 					"id": id
 				});
 			}
 
 			async function answerCall(id){
+				if(rtc_connection){
+					alert("You can't answer a call while in a call.");
+					return;
+				}
+
 				rtc_connection = new RTCPeerConnection(configuration);
 
 				try{
@@ -399,8 +407,12 @@
 
 			function disconnectCall(message = "Disconnected"){
 				var call_header = document.querySelector("#inside_header");
-				call_header.innerHTML = message;
-				hangup_sound.play();
+				
+				if(call_header.innerHTML != "Disconnected"){
+					call_header.innerHTML = message;
+					hangup_sound.play();
+				}
+				
 				ajax("api/close_call.php", "POST", {});
 				setTimeout(() => {
 					call_header.innerHTML = "Emergency Services";
@@ -410,7 +422,10 @@
 					document.querySelector("body").style.background = "linear-gradient(to bottom,rgba(42, 94, 232, 0.75) 0%,rgba(42, 94, 232, 1) 60%)";
 					window.location.hash = "#dispatch";
 				}, 2000);
-				rtc_connection.close();
+				if(rtc_connection){
+					rtc_connection.close();
+					rtc_connection = null;
+				}
 				if(localStream){
 					localStream.getTracks().forEach(function(track) {
 						track.stop();
