@@ -24,10 +24,10 @@
 			<main>
 				<form method="POST" class="container flex flex_column">
 					<img style="width:70px;" src="static/logo.svg" alt="">
-					<input class="container_part" type="email" autocomplete="off" maxlength="42" name="email" pattern="^[a-zA-Z0-9,.-_]{2,15}@[a-zA-Z0-9,.-_]{2,15}\.[a-zA-Z]{2,10}document.querySelector" title="Email can only contain english letters, comma, dash and underscore" placeholder="Email" required>
-					<input class="container_part" type="email" autocomplete="off" maxlength="42" name="email_confirm" pattern="^[a-zA-Z0-9,.-_]{2,15}@[a-zA-Z0-9,.-_]{2,15}\.[a-zA-Z]{2,10}document.querySelector" title="Email can only contain english letters, comma, dash and underscore" placeholder="Email confirm" required>
-					<input class="container_part" type="password" autocomplete="off" maxlength="100" pattern="^.{6,100}document.querySelector" name="pass" title="Password must have a length between 6 and 100." placeholder="Password" required>
-					<input class="container_part" style="margin: 15px 0 5px 0;" type="password" autocomplete="off" maxlength="100" pattern="^.{6,100}document.querySelector" name="pass_confirm" title="Password must have a length between 6 and 100." placeholder="Password confirm" required>
+					<input class="container_part" type="email" autocomplete="off" maxlength="42" name="email" pattern="^[a-zA-Z0-9,.-_]{2,15}@[a-zA-Z0-9,.-_]{2,15}\.[a-zA-Z]{2,10}$" title="Email can only contain english letters, comma, dash and underscore" placeholder="Email" required>
+					<input class="container_part" type="email" autocomplete="off" maxlength="42" name="email_confirm" pattern="^[a-zA-Z0-9,.-_]{2,15}@[a-zA-Z0-9,.-_]{2,15}\.[a-zA-Z]{2,10}$" title="Email can only contain english letters, comma, dash and underscore" placeholder="Email confirm" required>
+					<input class="container_part" type="password" autocomplete="off" maxlength="100" pattern="^.{6,100}$" name="pass" title="Password must have a length between 6 and 100." placeholder="Password" required>
+					<input class="container_part" style="margin: 15px 0 5px 0;" type="password" autocomplete="off" maxlength="100" pattern="^.{6,100}$" name="pass_confirm" title="Password must have a length between 6 and 100." placeholder="Password confirm" required>
 					<div style="margin-bottom: 15px;font-size:14px;text-align:center;">
 						<a href="panel">Go back to panel</a>
 					</div>

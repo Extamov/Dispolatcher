@@ -55,21 +55,21 @@
 			</div>
 			<div id="settings_container" class="main_container" style="display:none;">
 				<div class="s-table">
-					<form method="POST" class="s-table_row" style="max-width: 600px;">
+					<form method="POST" id="change_password_form" class="s-table_row" style="max-width: 600px;">
 						<div class="s-table_item">
 							<div style="border:0;border:0;">Change password</div>
 						</div>
 						<div class="s-table_item" style="border-top: 1px solid;">
 							<div style="border:0;">Previous password</div>
-							<div style="flex: 0.6;border:0;"><input type="password" style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
+							<div style="flex: 0.6;border:0;"><input type="password" name="old_pass" maxlength="100" pattern="^.{6,100}$" title="Password must have a length between 6 and 100." style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
 						</div>
 						<div class="s-table_item" style="border-top: 1px solid;">
 							<div style="border:0;">New password</div>
-							<div style="flex: 0.6;border:0;"><input type="password" style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
+							<div style="flex: 0.6;border:0;"><input type="password" name="new_pass" maxlength="100" pattern="^.{6,100}$" title="Password must have a length between 6 and 100." style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
 						</div>
 						<div class="s-table_item" style="border-top: 1px solid;">
 							<div style="border:0;">Confirm password</div>
-							<div style="flex: 0.6;border:0;"><input type="password" style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
+							<div style="flex: 0.6;border:0;"><input type="password" name="new_pass_confirm" maxlength="100" pattern="^.{6,100}$" title="Password must have a length between 6 and 100." style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
 						</div>
 						<div class="s-table_footer">
 							<input type="submit" class="positive_button" value="Submit">
@@ -138,6 +138,15 @@
 					nav.classList.add("responsive_nav");
 				}
 			}
+			document.querySelector("#change_password_form").onsubmit = event => {
+				var password = document.querySelector("input[name=new_pass]").value;
+				var password_confirm = document.querySelector("input[name=new_pass_confirm]").value;
+				if (password != password_confirm) {
+					alert("Password confim must be the same as Password");
+					return false;
+				}
+			}
+
 			function update_nav(event = null){
 				if(window.location.hash){
 					var hash = window.location.hash.substring(1);
@@ -222,13 +231,7 @@
 
 			function createMediaStream(){
 				return new Promise((resolve, reject) => {
-					navigator.mediaDevices.getUserMedia({
-						audio: {
-							channelCount: 2,
-							autoGainControl: false,
-							noiseSuppression: false,
-							echoCancellation: false
-					}}).then(stream => {
+					navigator.mediaDevices.getUserMedia({<?php	require_once(__DIR__."/../essentials/mediaproperties.php");	?>}).then(stream => {
 						resolve(stream);
 					}).catch(error => {
 						reject(error);
@@ -321,22 +324,24 @@
 						});
 
 						if(sendcandidates_response == "true"){
-							call_header.innerHTML = "Handshaking...";
 							function checking_connected(){
 								if(rtc_connection.connectionState == "connected"){
+									call_header.innerHTML = "connected";
 									rtc_connection.onconnectionstatechange = event => {
-										if(rtc_connection.connectionState != "connected"){
+										if(rtc_connection.connectionState == "disconnected"){
 											disconnectCall("Connection lost");
+										}else{
+											call_header.innerHTML = rtc_connection.connectionState;
 										}
 									}
-									call_header.innerHTML = "Emergency Call";
 									document.querySelector("body").style.background = "linear-gradient(45deg, rgba(234,155,73,1) 0%, rgba(32,124,229,1) 100%)";
-								}else if(rtc_connection.connectionState == "connecting"){
+								}else if(rtc_connection.connectionState == "disconnected"){
+									disconnectCall("Connection lost");
+								}else{
+									call_header.innerHTML = rtc_connection.connectionState;
 									setTimeout(() => {
 										checking_connected();
 									}, 1000);
-								}else{
-									disconnectCall("Handshaking failed");
 								}
 							}
 							checking_connected();
@@ -357,14 +362,16 @@
 			document.querySelector("#hangup_button").onclick = event => {disconnectCall();}
 
 			document.querySelector("#mute_button").onclick = event => {
-				if(localStream.getTracks()[0].enabled){
-					localStream.getTracks()[0].enabled = false;
-					document.querySelector("#mute_button").classList.add("muted");
+				if(localStream){
+					if(localStream.getTracks()[0].enabled){
+						localStream.getTracks()[0].enabled = false;
+						document.querySelector("#mute_button").classList.add("muted");
 						document.querySelector("#mute_button").classList.remove("unmuted");
-				}else{
-					localStream.getTracks()[0].enabled = true;
-					document.querySelector("#mute_button").classList.remove("muted");
+					}else{
+						localStream.getTracks()[0].enabled = true;
+						document.querySelector("#mute_button").classList.remove("muted");
 						document.querySelector("#mute_button").classList.add("unmuted");
+					}
 				}
 			}
 
@@ -376,7 +383,7 @@
 				setTimeout(() => {
 					call_header.innerHTML = "Emergency Services";
 					document.querySelector("#mute_button").classList.remove("muted");
-						document.querySelector("#mute_button").classList.add("unmuted");
+					document.querySelector("#mute_button").classList.add("unmuted");
 					document.querySelector("#call_nav").style.display = "none";
 					document.querySelector("body").style.background = "linear-gradient(to bottom,rgba(42, 94, 232, 0.75) 0%,rgba(42, 94, 232, 1) 60%)";
 					window.location.hash = "#dispatch";
@@ -397,6 +404,7 @@
 			window.onhashchange = update_nav;
 			check_calls_thread();
 			update_nav();
-	</script>
+			<?php if (isset($site_params["error"])) {echo ("alert(\"" . $site_params["error"] . "\");");}	?>
+		</script>
 	</body>
 </html>

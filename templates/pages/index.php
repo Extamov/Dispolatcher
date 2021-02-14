@@ -16,9 +16,9 @@
 		<main class="flex flex_column">
 			<div class="flex flex_column">
 				<div class="flex" id="inside_header" class="flex">Emergency Services</div>
-				<div class="flex" style="display:none;" id="police_logo"><img width="150" src="static/policeman.svg"></div> <!--display=''-->
+				<div class="flex" style="display:none;" id="police_logo"><img width="150" src="static/policeman.svg"></div>
 			</div>
-			<div class="flex" id="middle_block"> <!--align_flex_end-->
+			<div class="flex" id="middle_block">
 				<div style="flex:1;" class="flex">
 					<select name="type" id="select_type">
 						<option value="1">Police</option>
@@ -26,7 +26,7 @@
 						<option value="3">Fire Service</option>
 					</select>
 				</div>
-				<div class="flex" style="display:none;"> <!--display=''-->
+				<div class="flex" style="display:none;">
 					<button id="mute_button" class="unmuted"><i class="fas fa-microphone-slash responsive_icon"></i><br>mute</button>
 				</div>
 			</div>
@@ -59,13 +59,7 @@
 
 			function createMediaStream(){
 				return new Promise((resolve, reject) => {
-					navigator.mediaDevices.getUserMedia({
-						audio: {
-							channelCount: 2,
-							autoGainControl: false,
-							noiseSuppression: false,
-							echoCancellation: false
-					}}).then(stream => {
+					navigator.mediaDevices.getUserMedia({<?php	require_once(__DIR__."/../essentials/mediaproperties.php");	?>}).then(stream => {
 						resolve(stream);
 					}).catch(error => {
 						reject(error);
@@ -163,9 +157,12 @@
 
 					await rtc_connection.setRemoteDescription(JSON.parse(rtc_answer));
 
-					async function send_candidates(){
-						if(candidates.length > 0 && candidates[candidates.length-1] === null){
-							candidates.splice(candidates.length-1,1);
+					document.querySelector("#select_type").parentElement.style.display = "none";
+					document.querySelector("#mute_button").parentElement.style.display = "";
+
+					async function send_candidates() {
+						if (candidates.length > 0 && candidates[candidates.length - 1] === null) {
+							candidates.splice(candidates.length - 1, 1);
 							var sendcandidates_response = await ajax("api/send_candidates", "POST", {
 								candidates: JSON.stringify(candidates)
 							});
@@ -186,12 +183,14 @@
 									dialing_sound.pause();
 									function checking_connected(){
 										if(rtc_connection.connectionState == "connected"){
+											call_header.innerHTML = "connected";
 											rtc_connection.onconnectionstatechange = event => {
-												if(rtc_connection.connectionState != "connected"){
+												if(rtc_connection.connectionState == "disconnected"){
 													disconnectCall("Connection lost");
+												}else{
+													call_header.innerHTML = rtc_connection.connectionState;
 												}
 											}
-											call_header.innerHTML = "Emergency call";
 											document.querySelector("#inside_header").classList.add("align_flex_end");
 											document.querySelector("#middle_block").classList.add("align_flex_end");
 											document.querySelector("#select_type").parentElement.style.display = "none";
@@ -200,12 +199,13 @@
 											document.querySelector("body").style.background = "linear-gradient(45deg, rgba(234,155,73,1) 0%, rgba(32,124,229,1) 100%)";
 											try{document.querySelector("#call_button").id = "hangup_button";}catch{}
 											document.querySelector("#hangup_button").disabled = false;
-										}else if(rtc_connection.connectionState == "connecting"){
+										}else if(rtc_connection.connectionState == "disconnected"){
+											disconnectCall("Connection lost");
+										}else{
+											call_header.innerHTML = rtc_connection.connectionState;
 											setTimeout(() => {
 												checking_connected();
 											}, 1000);
-										}else{
-											disconnectCall("Handshaking failed");
 										}
 									}
 									checking_connected();
@@ -228,14 +228,16 @@
 				}
 
 				document.querySelector("#mute_button").onclick = event => {
-					if(localStream.getTracks()[0].enabled){
-						localStream.getTracks()[0].enabled = false;
-						document.querySelector("#mute_button").classList.add("muted");
-						document.querySelector("#mute_button").classList.remove("unmuted");
-					}else{
-						localStream.getTracks()[0].enabled = true;
-						document.querySelector("#mute_button").classList.remove("muted");
-						document.querySelector("#mute_button").classList.add("unmuted");
+					if(localStream){
+						if(localStream.getTracks()[0].enabled){
+							localStream.getTracks()[0].enabled = false;
+							document.querySelector("#mute_button").classList.add("muted");
+							document.querySelector("#mute_button").classList.remove("unmuted");
+						}else{
+							localStream.getTracks()[0].enabled = true;
+							document.querySelector("#mute_button").classList.remove("muted");
+							document.querySelector("#mute_button").classList.add("unmuted");
+						}
 					}
 				}
 
