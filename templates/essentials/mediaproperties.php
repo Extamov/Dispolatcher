@@ -1,6 +1,6 @@
 audio: {
     channelCount: 1,
-    autoGainControl: false,
+    autoGainControl: true,
     noiseSuppression: false,
     echoCancellation: false
 }

@@ -317,34 +317,48 @@
 				}
 
 				async function send_candidates(){
-					if(candidates.length > 0 && candidates[candidates.length-1] === null){
+					if(candidates.length > 0 && (
+							candidates[candidates.length - 1] === null ||
+							rtc_connection.iceConnectionState == "completed" ||
+							rtc_connection.iceConnectionState == "connected" ||
+							rtc_connection.iceGatheringState == "complete")
+					){
 						candidates.splice(candidates.length-1,1);
 						var sendcandidates_response = await ajax("api/send_candidates", "POST", {
 							candidates: JSON.stringify(candidates)
 						});
 
 						if(sendcandidates_response == "true"){
-							function checking_connected(){
-								if(rtc_connection.connectionState == "connected"){
-									call_header.innerHTML = "connected";
-									rtc_connection.onconnectionstatechange = event => {
-										if(rtc_connection.connectionState == "disconnected"){
-											disconnectCall("Connection lost");
-										}else{
-											call_header.innerHTML = rtc_connection.connectionState;
-										}
-									}
-									document.querySelector("body").style.background = "linear-gradient(45deg, rgba(234,155,73,1) 0%, rgba(32,124,229,1) 100%)";
-								}else if(rtc_connection.connectionState == "disconnected"){
-									disconnectCall("Connection lost");
-								}else{
-									call_header.innerHTML = rtc_connection.connectionState;
+							function checkStatus(disconnect_timeout){
+								if(rtc_connection.iceConnectionState == "connected" && !isConnectedStyle()){
+									call_header.innerHTML = "Emergency call";
+									connectedCallStyle();
+								}else if(disconnect_timeout >= 20){
+									disconnectCall("Connection lost")
+								}else if(
+									rtc_connection.iceConnectionState == "disconnected" ||
+									rtc_connection.iceConnectionState == "failed"
+								){
+									call_header.innerHTML = "Reconnecting";
+									disconnect_timeout += 1;
+								}else if(
+									rtc_connection.iceConnectionState == "connecting" ||
+									rtc_connection.iceConnectionState == "connected"
+								){
+									call_header.innerHTML = "Emergency call";
+									disconnect_timeout = 0;
+								}
+
+
+								if(rtc_connection && rtc_connection.iceConnectionState != "closed"){
 									setTimeout(() => {
-										checking_connected();
-									}, 1000);
+										checkStatus(disconnect_timeout);
+									}, 500);
 								}
 							}
-							checking_connected();
+
+							call_header.innerHTML = "Connecting";
+							checkStatus(0);
 						}else{
 							disconnectCall("Exchanging failed");
 							return;
@@ -373,6 +387,14 @@
 						document.querySelector("#mute_button").classList.add("unmuted");
 					}
 				}
+			}
+
+			function connectedCallStyle(){
+				document.querySelector("body").style.background = "linear-gradient(45deg, rgba(234,155,73,1) 0%, rgba(32,124,229,1) 100%)";
+			}
+
+			function isConnectedStyle(){
+				return (document.querySelector("body").style.background == "linear-gradient(45deg, rgba(234,155,73,1) 0%, rgba(32,124,229,1) 100%)");
 			}
 
 			function disconnectCall(message = "Disconnected"){

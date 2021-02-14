@@ -161,7 +161,12 @@
 					document.querySelector("#mute_button").parentElement.style.display = "";
 
 					async function send_candidates() {
-						if (candidates.length > 0 && candidates[candidates.length - 1] === null) {
+						if(candidates.length > 0 && (
+							candidates[candidates.length - 1] === null ||
+							rtc_connection.iceConnectionState == "completed" ||
+							rtc_connection.iceConnectionState == "connected" ||
+							rtc_connection.iceGatheringState == "complete")
+						){
 							candidates.splice(candidates.length - 1, 1);
 							var sendcandidates_response = await ajax("api/send_candidates", "POST", {
 								candidates: JSON.stringify(candidates)
@@ -179,36 +184,38 @@
 									received_candidates.forEach(candidate => {
 										rtc_connection.addIceCandidate(candidate);
 									});
-									call_header.innerHTML = "Handshaking...";
 									dialing_sound.pause();
-									function checking_connected(){
-										if(rtc_connection.connectionState == "connected"){
-											call_header.innerHTML = "connected";
-											rtc_connection.onconnectionstatechange = event => {
-												if(rtc_connection.connectionState == "disconnected"){
-													disconnectCall("Connection lost");
-												}else{
-													call_header.innerHTML = rtc_connection.connectionState;
-												}
-											}
-											document.querySelector("#inside_header").classList.add("align_flex_end");
-											document.querySelector("#middle_block").classList.add("align_flex_end");
-											document.querySelector("#select_type").parentElement.style.display = "none";
-											document.querySelector("#police_logo").style.display = "";
-											document.querySelector("#mute_button").parentElement.style.display = "";
-											document.querySelector("body").style.background = "linear-gradient(45deg, rgba(234,155,73,1) 0%, rgba(32,124,229,1) 100%)";
-											try{document.querySelector("#call_button").id = "hangup_button";}catch{}
-											document.querySelector("#hangup_button").disabled = false;
-										}else if(rtc_connection.connectionState == "disconnected"){
-											disconnectCall("Connection lost");
-										}else{
-											call_header.innerHTML = rtc_connection.connectionState;
+
+									function checkStatus(disconnect_timeout){
+										if(rtc_connection.iceConnectionState == "connected" && !isConnectedStyle()){
+											call_header.innerHTML = "Emergency call";
+											connectedCallStyle();
+										}else if(disconnect_timeout >= 20){
+											disconnectCall("Connection lost")
+										}else if(
+											rtc_connection.iceConnectionState == "disconnected" ||
+											rtc_connection.iceConnectionState == "failed"
+										){
+											call_header.innerHTML = "Reconnecting";
+											disconnect_timeout += 1;
+										}else if(
+											rtc_connection.iceConnectionState == "connecting" ||
+											rtc_connection.iceConnectionState == "connected"
+										){
+											call_header.innerHTML = "Emergency call";
+											disconnect_timeout = 0;
+										}
+
+
+										if(rtc_connection && rtc_connection.iceConnectionState != "closed"){
 											setTimeout(() => {
-												checking_connected();
-											}, 1000);
+												checkStatus(disconnect_timeout);
+											}, 500);
 										}
 									}
-									checking_connected();
+
+									call_header.innerHTML = "Connecting";
+									checkStatus(0);
 								}
 							}else{
 								disconnectCall("Exchange failed");
@@ -241,6 +248,21 @@
 					}
 				}
 
+				function connectedCallStyle(){
+					document.querySelector("#inside_header").classList.add("align_flex_end");
+					document.querySelector("#middle_block").classList.add("align_flex_end");
+					document.querySelector("#select_type").parentElement.style.display = "none";
+					document.querySelector("#police_logo").style.display = "";
+					document.querySelector("#mute_button").parentElement.style.display = "";
+					document.querySelector("body").style.background = "linear-gradient(45deg, rgba(234,155,73,1) 0%, rgba(32,124,229,1) 100%)";
+					try{document.querySelector("#call_button").id = "hangup_button";}catch{}
+					document.querySelector("#hangup_button").disabled = false;
+				}
+
+				function isConnectedStyle(){
+					return (document.querySelector("#police_logo").style.display !== "none");
+				}
+
 				function disconnectCall(message = "Disconnected"){
 					var call_header = document.querySelector("#inside_header");
 					call_header.innerHTML = message;
@@ -261,6 +283,7 @@
 						document.querySelector("#mute_button").classList.add("unmuted");
 					}, 2000);
 					rtc_connection.close();
+					rtc_connection = null;
 					if(localStream){
 						localStream.getTracks().forEach(function(track) {
 							track.stop();
