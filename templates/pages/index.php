@@ -37,17 +37,7 @@
 		<footer><?php	require_once(__DIR__."/../essentials/footer.php");	?></footer>
 		<audio autoplay></audio>
 		<script>
-			const configuration = {
-				iceServers: [
-					{
-						urls: [
-							'stun:stun.l.google.com:19302',
-							'stun:stun1.l.google.com:19302',
-							'stun:stun2.l.google.com:19302'
-						],
-					},
-				],
-			};
+			<?php	require_once(__DIR__."/../essentials/iceservers.php");	?>
 			var rtc_connection;
 			var candidates;
 			var localStream;

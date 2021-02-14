@@ -11,9 +11,9 @@ ALTER TABLE `accounts`
 CREATE TABLE `calls` (
   `id` varchar(12) COLLATE utf8mb4_bin NOT NULL,
   `caller_session_id` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `dispatcher_email` varchar(42) COLLATE utf8mb4_bin DEFAULT NULL,
-  `caller_ip` varchar(20) COLLATE utf8mb4_bin NOT NULL,
-  `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dispatcher_email` varchar(42) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `caller_ip` varchar(40) COLLATE utf8mb4_bin NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `type` enum('POLICE','AMBULANCE','FIRE_SERVICE','') COLLATE utf8mb4_bin NOT NULL,
   `offer` json DEFAULT NULL,
   `answer` json DEFAULT NULL,
@@ -23,4 +23,3 @@ CREATE TABLE `calls` (
 
 ALTER TABLE `calls`
   ADD PRIMARY KEY (`id`);
-COMMIT;
