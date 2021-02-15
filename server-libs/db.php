@@ -3,7 +3,11 @@
 		private $db_con;
 
 		function __construct(){
-			$this->db_con = new PDO("mysql:host=localhost;dbname=dispolatcher", "root", "extzapy");
+			$host = "PUT DB IP ADDRESS HERE";
+			$username = "PUT DB USERNAME HERE";
+			$password = "PUT DB PASSWORD HERE";
+			$database_name = "PUT DB NAME HERE";
+			$this->db_con = new PDO("mysql:host=".$host.";dbname=".$database_name, $username, $password);
 		}
 
 		function __destruct(){

@@ -29,7 +29,9 @@
 					<input class="container_part" type="password" autocomplete="off" maxlength="100" pattern="^.{6,100}$" name="pass" title="Password must have a length between 6 and 100." placeholder="Password" required>
 					<input class="container_part" style="margin: 15px 0 5px 0;" type="password" autocomplete="off" maxlength="100" pattern="^.{6,100}$" name="pass_confirm" title="Password must have a length between 6 and 100." placeholder="Password confirm" required>
 					<div style="margin-bottom: 15px;font-size:14px;text-align:center;">
-						<a href="panel">Go back to panel</a>
+						<?php	if(!isset($site_params["first_user"])){	?>
+							<a href="panel#admin">Go back to panel</a>
+						<?php	}	?>
 					</div>
 					<input class="container_part" type="submit" value="SIGN UP">
 				</form>

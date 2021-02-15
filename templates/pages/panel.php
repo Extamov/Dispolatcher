@@ -10,17 +10,17 @@
 		<header>
 			<nav>
 				<div id="logo_nav">
-					<a href="#dispatch">
+					<a href="panel">
 						<img src="static/logo.svg" width="30">
 						<span id="logo_text">police</span>
 					</a>
 				</div>
 				<div id="call_nav" style="display:none;"><a href="#call">Call</a></div>
-				<div><a href="#dispatch">Dispatch</a></div>
-				<?php	if(isset($site_params["level"]) && $site_params["level"] >= 2){?>
-					<div><a href="#admin">Admin</a></div>
+				<div id="dispatch_nav"><a href="#dispatch">Dispatch</a></div>
+				<?php	if(isset($site_params["level"]) && $site_params["level"] >= 1){?>
+					<div id="admin_nav"><a href="#admin">Admin</a></div>
 				<?php	}	?>
-				<div><a href="#settings">Settings</a></div>
+				<div id="settings_nav"><a href="#settings">Settings</a></div>
 				<div id="logout_nav"><a id="logout_button" href="logout">Logout</a></div>
 				<div id="nav_button_block"><a id="nav_button" href="javascript:void(0)" onclick="nav_responsive();"><i class="fa fa-bars"></i></a></div>
 			</nav>
@@ -28,51 +28,42 @@
 		<main>
 			<div id="dispatch_container" class="main_container" style="display:none;">
 				<div class="s-table" id="dispatch_table">
-					<div class="s-table_row">
-						<div class="s-table_item">
-							<div>Type</div>
-							<div>Loading...</div>
-						</div>
-						<div class="s-table_item">
-							<div>IP</div>
-							<div>Loading...</div>
-						</div>
-						<div class="s-table_item">
-							<div>Location</div>
-							<div>Loading...</div>
-						</div>
-						<div class="s-table_item">
-							<div>Time</div>
-							<div>Loading...</div>
-						</div>
+					<div class="s-table_row s-table_header">
+						<div class="s-table_item">Dispatches (Loading...)</div>
 						<div class="s-table_footer">
-							<a class="positive_button" href="#">Loading...</a>
-							<a class="negative_button" href="#">Loading...</a>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div id="settings_container" class="main_container" style="display:none;">
 				<div class="s-table">
-					<form method="POST" id="change_password_form" class="s-table_row" style="max-width: 600px;">
+					<div class="s-table_row s-table_header" style="padding: 15px 0;">
+						<div class="s-table_item">Settings</div>
+						<div class="s-table_footer">
+						</div>
+					</div>
+					<form method="POST" id="change_password_form" class="s-table_row">
 						<div class="s-table_item">
 							<div style="border:0;border:0;">Change password</div>
 						</div>
 						<div class="s-table_item" style="border-top: 1px solid;">
-							<div style="border:0;">Previous password</div>
-							<div style="flex: 0.6;border:0;"><input type="password" name="old_pass" maxlength="100" pattern="^.{6,100}$" title="Password must have a length between 6 and 100." style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
+							<div style="border:0;" class="responsive_title">Previous password</div>
+							<div style="border:0;"><input type="password" name="old_pass" placeholder="Old Password" maxlength="100" pattern="^.{6,100}$" title="Password must have a length between 6 and 100." style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
 						</div>
 						<div class="s-table_item" style="border-top: 1px solid;">
-							<div style="border:0;">New password</div>
-							<div style="flex: 0.6;border:0;"><input type="password" name="new_pass" maxlength="100" pattern="^.{6,100}$" title="Password must have a length between 6 and 100." style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
+							<div style="border:0;" class="responsive_title">New password</div>
+							<div style="border:0;"><input type="password" name="new_pass" placeholder="New Password" maxlength="100" pattern="^.{6,100}$" title="Password must have a length between 6 and 100." style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
 						</div>
 						<div class="s-table_item" style="border-top: 1px solid;">
-							<div style="border:0;">Confirm password</div>
-							<div style="flex: 0.6;border:0;"><input type="password" name="new_pass_confirm" maxlength="100" pattern="^.{6,100}$" title="Password must have a length between 6 and 100." style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
+							<div style="border:0;" class="responsive_title">Confirm password</div>
+							<div style="border:0;"><input type="password" name="new_pass_confirm" placeholder="Confirm Password" maxlength="100" pattern="^.{6,100}$" title="Password must have a length between 6 and 100." style="width: 85%;border-radius: 10px;border: 0;padding: 6px 0 6px 6px;background: rgb(120,190,255);font-size: 16px;"></div>
 						</div>
 						<div class="s-table_footer">
 							<input type="submit" class="positive_button" value="Submit">
 						</div>
+					</form>
+					<form class="s-table_row super_button" method="POST">
+						<input type="submit" style="width:100%;height:100%;padding: 15px 0;border-radius:10px;" class="super_button" name="unsession" value="Deauthorize other sessions">
 					</form>
 				</div>
 			</div>
@@ -91,7 +82,7 @@
 				</div>
 			</div>
 			<div id="admin_container" class="main_container" style="display:none;">
-
+					<?php	if(isset($site_params["dispatchers_html_table"])){echo($site_params["dispatchers_html_table"]);}	?>
 			</div>
 		</main>
 		<audio autoplay></audio>
@@ -153,11 +144,9 @@
 						navs.forEach(nav => {
 							document.querySelector("#"+nav+"_container").style.display = "none";
 						});
-						if(document.querySelector("#"+hash+"_nav")){
-							if(document.querySelector("#"+hash+"_nav").style.display == "none"){
-								window.location.href = "#dispatch";
-								return;
-							}
+						if(!document.querySelector("#"+hash+"_nav") || document.querySelector("#"+hash+"_nav").style.display == "none"){
+							window.location.href = "#dispatch";
+							return;
 						}
 
 						document.querySelector("#"+hash+"_container").style.display = "";
@@ -174,7 +163,13 @@
 			async function check_calls_thread(){
 				var calls = JSON.parse(await ajax("api/receive_calls", "GET"));
 				var s_table = document.querySelector("#dispatch_table");
-				var table_html = "";
+				var table_html = `
+					<div class="s-table_row s-table_header" style="padding: 15px 0;">
+						<div class="s-table_item">Dispatches</div>
+						<div class="s-table_footer">
+						</div>
+					</div>
+				`;
 				var new_ids_order = [];
 
 				calls.forEach(call => {
@@ -186,6 +181,18 @@
 					}else{
 						type = "Fire Service";
 					}
+
+					var location_column = "";
+
+					if(call["location"]){
+						location_column = `
+							<div class="s-table_item">
+								<div>Location</div>
+								<div>${call["location"]}</div>
+							</div>
+						`;
+					}
+
 					table_html += `
 					<div class="s-table_row">
 						<div class="s-table_item">
@@ -199,7 +206,7 @@
 						<div class="s-table_item">
 							<div>Time</div>
 							<div>${call["date"]}</div>
-						</div>
+						</div>${location_column}
 						<div class="s-table_footer">
 							<a class="positive_button" href="#" onclick="answerCall('${call["id"]}');">Accept</a>
 							<a class="negative_button" href="#" onclick="denyCall('${call["id"]}');">Deny</a>

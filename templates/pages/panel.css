@@ -136,8 +136,7 @@ button, input{
 	border-right: 2px solid rgba(150,150,190,1);
 }
 .s-table_item > *:nth-child(2) {
-	flex: 0.8;
-	/* border-left: 1px solid rgba(150,150,190,1); */
+	flex: 1;
 }
 .s-table_item > *{
 	text-align: center;
@@ -170,8 +169,12 @@ button, input{
 .negative_button{
 	background-color: rgb(160, 50, 50);
 }
-.positive_button:hover, .negative_button:hover{
+.super_button{
+	background-color: rgba(20, 130, 220, 0.5);
+}
+.positive_button:hover, .negative_button:hover, .super_button:hover{
 	filter: brightness(110%);
+	cursor: pointer;
 }
 #nav_button_block{
 	float:right;
@@ -180,6 +183,11 @@ button, input{
 	top: 12px;
 	right: 15px;
 	font-size: 25px;
+}
+.s-table_header{
+	padding: 20px 0;
+	border-radius: 50px;
+	background-color: rgb(10,10,220);
 }
 @media screen and (max-width: 750px) {
 	nav > div:not(:first-child){
@@ -226,6 +234,12 @@ button, input{
 	}
 	.responsive_nav #nav_button_block{
 		top: 6px;
+	}
+}
+@media screen and (max-width: 620px){
+	.responsive_title{
+		display: none;
+		flex:0;
 	}
 }
 

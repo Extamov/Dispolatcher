@@ -28,6 +28,7 @@
 				"date" => $call_row["date"],
 				"type" => $call_row["type"],
 				"caller_ip" => $call_row["caller_ip"],
+				"location" => $call_row["location"],
 				"offer" => $call_row["offer"]
 			));
 		}

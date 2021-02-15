@@ -6,7 +6,7 @@
 	</head>
 	<body>
 		<div id="root">
-			<header>Police Dispatch Login</header>
+			<header>Police Dispatch Restore</header>
 			<main>
 				<form method="POST" class="container flex flex_column">
 					<img style="width:70px;" src="static/logo.svg" alt="">

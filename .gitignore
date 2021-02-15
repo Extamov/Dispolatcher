@@ -1,0 +1,5 @@
+# PHP
+
+/vendor/*
+!/vendor/.htaccess
+composer.lock
