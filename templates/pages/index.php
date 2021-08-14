@@ -2,14 +2,17 @@
 <html lang="en">
 	<head>
 		<?php	require_once(__DIR__."/../essentials/head.php");	?>
-		<script src="static/fontawesome.js"></script>
-		<script src="static/jquery.js"></script>
 		<style><?php	require_once(__DIR__."/index.css");	?></style>
 	</head>
+
 	<body>
 		<header>
 			<a href="login" id="login">
-				<span id="login_icon"><i class="fas fa-sign-in-alt"></i></span>
+				<span id="login_icon">
+					<svg style="width: 1em; height: 1em; vertical-align: -.125em;" viewBox="0 0 512 512">
+						<path fill="currentColor" d="M416 448h-84c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h84c17.7 0 32-14.3 32-32V160c0-17.7-14.3-32-32-32h-84c-6.6 0-12-5.4-12-12V76c0-6.6 5.4-12 12-12h84c53 0 96 43 96 96v192c0 53-43 96-96 96zm-47-201L201 79c-15-15-41-4.5-41 17v96H24c-13.3 0-24 10.7-24 24v96c0 13.3 10.7 24 24 24h136v96c0 21.5 26 32 41 17l168-168c9.3-9.4 9.3-24.6 0-34z"></path>
+					</svg>
+				</span>
 				<span id="login_text">Login</span>
 			</a>
 		</header>
@@ -27,288 +30,26 @@
 					</select>
 				</div>
 				<div class="flex" style="display:none;">
-					<button id="mute_button" class="unmuted"><i class="fas fa-microphone-slash responsive_icon"></i><br>mute</button>
+					<button id="mute_button" class="unmuted">
+						<svg style="width: 1.25em; height: 1em; vertical-align: -.125em; font-size: 30px;" viewBox="0 0 640 512">
+							<path fill="currentColor" d="M633.82 458.1l-157.8-121.96C488.61 312.13 496 285.01 496 256v-48c0-8.84-7.16-16-16-16h-16c-8.84 0-16 7.16-16 16v48c0 17.92-3.96 34.8-10.72 50.2l-26.55-20.52c3.1-9.4 5.28-19.22 5.28-29.67V96c0-53.02-42.98-96-96-96s-96 42.98-96 96v45.36L45.47 3.37C38.49-2.05 28.43-.8 23.01 6.18L3.37 31.45C-2.05 38.42-.8 48.47 6.18 53.9l588.36 454.73c6.98 5.43 17.03 4.17 22.46-2.81l19.64-25.27c5.41-6.97 4.16-17.02-2.82-22.45zM400 464h-56v-33.77c11.66-1.6 22.85-4.54 33.67-8.31l-50.11-38.73c-6.71.4-13.41.87-20.35.2-55.85-5.45-98.74-48.63-111.18-101.85L144 241.31v6.85c0 89.64 63.97 169.55 152 181.69V464h-56c-8.84 0-16 7.16-16 16v16c0 8.84 7.16 16 16 16h160c8.84 0 16-7.16 16-16v-16c0-8.84-7.16-16-16-16z"></path>
+						</svg><br>mute
+					</button>
 				</div>
 			</div>
 			<div class="flex">
-				<button id="call_button" class="round_button"><i class="fas fa-phone responsive_icon"></i></button>
+				<button id="call_button" class="round_button">
+					<svg style="width: 1em; height: 1em; vertical-align: -.125em; font-size: 30px;" viewBox="0 0 512 512">
+						<path fill="currentColor" d="M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"></path>
+					</svg>
+				</button>
 			</div>
 		</main>
 		<footer><?php	require_once(__DIR__."/../essentials/footer.php");	?></footer>
 		<audio autoplay></audio>
 		<script>
 			<?php	require_once(__DIR__."/../essentials/iceservers.php");	?>
-			var rtc_connection;
-			var candidates;
-			var localStream;
-			var remoteStream;
-
-			function ajax(url, method, body){
-				return new Promise((resolve, reject) => {
-					$.ajax({
-						method: method,
-						url: url,
-						data: body
-					}).done(data => {
-						resolve(data);
-					}).fail(() => {
-						setTimeout(() => {resolve(ajax(url, method, body))}, 1000);
-					})
-				})
-			}
-
-			function createMediaStream(){
-				return new Promise((resolve, reject) => {
-					navigator.mediaDevices.getUserMedia({<?php	require_once(__DIR__."/../essentials/mediaproperties.php");	?>}).then(stream => {
-						resolve(stream);
-					}).catch(error => {
-						reject(error);
-					});
-				});
-			}
-
-			async function wait_for_answer(){
-				return new Promise(async (resolve, reject) => {
-					var response = await ajax("api/get_answer", "POST", {});
-
-					if(response === "waiting"){
-						setTimeout(() => {resolve(wait_for_answer())}, 400);
-					}else{
-						resolve(response);
-					}
-				});
-			}
-
-			async function wait_for_candidates(){
-				return new Promise(async (resolve, reject) => {
-					var response = await ajax("api/receive_candidates", "POST", {});
-
-					if(response === "waiting"){
-						setTimeout(() => {resolve(wait_for_candidates())}, 400);
-					}else{
-						resolve(response);
-					}
-				});
-			}
-
-			var dialing_sound = new Audio("static/calling.webm");
-			dialing_sound.loop = true;
-			var hold_sound = new Audio("static/hold.opus");
-			hold_sound.loop = true;
-			var hangup_sound = new Audio("static/hangup.opus");
-
-			document.querySelector("#call_button").onclick = async (event) => {
-				if(document.querySelector("#call_button")){
-					try{document.querySelector("#call_button").id = "hangup_button";}catch{}
-
-					var call_header = document.querySelector("#inside_header");
-					var call_type = document.querySelector("#select_type").value;
-
-					rtc_connection = new RTCPeerConnection(configuration);
-
-					try{
-						localStream = await createMediaStream();
-						localStream.getTracks().forEach(track => rtc_connection.addTrack(track, localStream));
-					}catch{
-						alert("You must enable microphone access in order to call.");
-						try{document.querySelector("#hangup_button").id = "call_button";}catch{}
-						return;
-					}
-
-					call_header.innerHTML = "Registering...";
-
-					candidates = [];
-
-					remoteStream = new MediaStream();
-					document.querySelector("audio").srcObject = remoteStream;
-
-					rtc_connection.addEventListener('track', async (event) => {
-						remoteStream.addTrack(event.track, remoteStream);
-					});
-
-					rtc_connection.onicecandidate = async (event) => {
-						candidates.push(event.candidate);
-					}
-
-					var rtc_offer = await rtc_connection.createOffer();
-
-					await rtc_connection.setLocalDescription(rtc_offer);
-
-					var registercall_response = await ajax("api/register_call", "POST", {
-						type: call_type,
-						rtc_offer: JSON.stringify(rtc_offer)
-					});
-
-					if(registercall_response != "true"){
-						disconnectCall("Failed to register");
-						return;
-					}
-
-					call_header.innerHTML = "Calling...";
-					dialing_sound.currentTime = 0;
-					dialing_sound.play();
-
-					rtc_answer = await wait_for_answer();
-
-					if(rtc_answer == "false"){
-						disconnectCall("Call rejected");
-						return;
-					}else if(rtc_answer == "timeout"){
-						disconnectCall("Timed out");
-						return;
-					}
-
-					await rtc_connection.setRemoteDescription(JSON.parse(rtc_answer));
-
-					document.querySelector("#select_type").parentElement.style.display = "none";
-					document.querySelector("#mute_button").parentElement.style.display = "";
-
-					async function send_candidates() {
-						if(candidates.length > 0 && (
-							candidates[candidates.length - 1] === null ||
-							rtc_connection.iceConnectionState == "completed" ||
-							rtc_connection.iceConnectionState == "connected" ||
-							rtc_connection.iceGatheringState == "complete")
-						){
-							candidates.splice(candidates.length - 1, 1);
-							var sendcandidates_response = await ajax("api/send_candidates", "POST", {
-								candidates: JSON.stringify(candidates)
-							});
-
-							if(sendcandidates_response == "true"){
-								var receivecandidates_response = await wait_for_candidates();
-
-								if(receivecandidates_response == "false"){
-									disconnectCall("Exchange failed");
-								}else if(receivecandidates_response == "timeout"){
-									disconnectCall("Timed out");
-								}else{
-									received_candidates = JSON.parse(receivecandidates_response);
-									received_candidates.forEach(candidate => {
-										rtc_connection.addIceCandidate(candidate);
-									});
-									hold_sound.pause();
-
-									function checkStatus(disconnect_timeout){
-										if(rtc_connection.iceConnectionState == "connected" && !isConnectedStyle()){
-											call_header.innerHTML = "Emergency call";
-											connectedCallStyle();
-										}else if(disconnect_timeout >= 20){
-											disconnectCall("Connection lost")
-										}else if(
-											rtc_connection.iceConnectionState == "disconnected" ||
-											rtc_connection.iceConnectionState == "failed"
-										){
-											call_header.innerHTML = "Reconnecting";
-											disconnect_timeout += 1;
-										}else if(
-											rtc_connection.iceConnectionState == "connecting" ||
-											rtc_connection.iceConnectionState == "connected"
-										){
-											call_header.innerHTML = "Emergency call";
-											disconnect_timeout = 0;
-										}
-
-
-										if(rtc_connection && rtc_connection.iceConnectionState != "closed"){
-											setTimeout(() => {
-												checkStatus(disconnect_timeout);
-											}, 500);
-										}
-									}
-
-									call_header.innerHTML = "Connecting";
-									checkStatus(0);
-								}
-							}else{
-								disconnectCall("Exchange failed");
-							}
-						}else{
-							setTimeout(() => {
-								send_candidates()
-							}, 1000);
-						}
-					}
-
-					dialing_sound.pause();
-					hold_sound.currentTime = 0;
-					hold_sound.play();
-					send_candidates();
-
-					call_header.innerHTML = "Exchanging";
-				}else{
-					disconnectCall();
-				}
-
-				document.querySelector("#mute_button").onclick = event => {
-					if(localStream){
-						if(localStream.getTracks()[0].enabled){
-							localStream.getTracks()[0].enabled = false;
-							document.querySelector("#mute_button").classList.add("muted");
-							document.querySelector("#mute_button").classList.remove("unmuted");
-						}else{
-							localStream.getTracks()[0].enabled = true;
-							document.querySelector("#mute_button").classList.remove("muted");
-							document.querySelector("#mute_button").classList.add("unmuted");
-						}
-					}
-				}
-
-				function connectedCallStyle(){
-					document.querySelector("#inside_header").classList.add("align_flex_end");
-					document.querySelector("#middle_block").classList.add("align_flex_end");
-					document.querySelector("#select_type").parentElement.style.display = "none";
-					document.querySelector("#police_logo").style.display = "";
-					document.querySelector("#mute_button").parentElement.style.display = "";
-					document.querySelector("body").style.background = "linear-gradient(45deg, rgba(234,155,73,1) 0%, rgba(32,124,229,1) 100%)";
-					try{document.querySelector("#call_button").id = "hangup_button";}catch{}
-					document.querySelector("#hangup_button").disabled = false;
-				}
-
-				function isConnectedStyle(){
-					return (document.querySelector("#police_logo").style.display !== "none");
-				}
-
-				function disconnectCall(message = "Disconnected"){
-					var call_header = document.querySelector("#inside_header");
-
-					if(call_header.innerHTML != "Disconnected"){
-						call_header.innerHTML = message;
-						hangup_sound.play();
-					}
-
-					dialing_sound.pause();
-					hold_sound.pause();
-					ajax("api/close_call.php", "POST", {});
-					setTimeout(() => {
-						call_header.innerHTML = "Emergency Services";
-						document.querySelector("#inside_header").classList.remove("align_flex_end");
-						document.querySelector("#middle_block").classList.remove("align_flex_end");
-						document.querySelector("#select_type").parentElement.style.display = "";
-						document.querySelector("#police_logo").style.display = "none";
-						document.querySelector("#mute_button").parentElement.style.display = "none";
-						document.querySelector("body").style.background = "linear-gradient(45deg, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%)";
-						try{document.querySelector("#hangup_button").id = "call_button";}catch{}
-						document.querySelector("#call_button").disabled = false;
-						document.querySelector("#mute_button").classList.remove("muted");
-						document.querySelector("#mute_button").classList.add("unmuted");
-					}, 2000);
-					if(rtc_connection){
-						rtc_connection.close();
-						rtc_connection = null;
-					}
-					if(localStream){
-						localStream.getTracks().forEach(function(track) {
-							track.stop();
-						});
-					}
-					if(remoteStream){
-						remoteStream.getTracks().forEach(function(track) {
-							track.stop();
-						});
-					}
-				}
-			};
+			<?php	require_once(__DIR__."/index.js");	?>
 		</script>
 	</body>
 </html>

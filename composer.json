@@ -1,14 +1,14 @@
 {
-    "name": "extamov/dispolatcher",
-    "description": "A system for police dispatchers based on WEB and backended by PHP on Apache web server.",
-    "authors": [
-        {
-            "name": "Extamov (Osher H)",
-            "email": "extamov@gmail.com"
-        }
-    ],
-    "license": "GNU AGPLv3",
-    "require": {
-        "phpmailer/phpmailer": "^6.2"
-    }
+	"name": "extamov/dispolatcher",
+	"description": "A web system made for emergency dispatch.",
+	"authors": [
+		{
+			"name": "Extamov",
+			"email": "extamov@gmail.com"
+		}
+	],
+	"license": "GPL-3.0-only",
+	"require": {
+		"phpmailer/phpmailer": "^6.5"
+	}
 }

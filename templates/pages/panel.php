@@ -2,8 +2,6 @@
 <html lang="en">
 	<head>
 		<?php	require_once(__DIR__."/../essentials/head.php");	?>
-		<script src="static/fontawesome.js"></script>
-		<script src="static/jquery.js"></script>
 		<style><?php	require_once(__DIR__."/panel.css");	?></style>
 	</head>
 	<body>
@@ -11,8 +9,8 @@
 			<nav>
 				<div id="logo_nav">
 					<a href="panel">
-						<img src="static/logo.svg" width="30">
-						<span id="logo_text">police</span>
+						<img src="static/logo.svg" alt="logo" width="30">
+						<span id="logo_text">Dispolatcher</span>
 					</a>
 				</div>
 				<div id="call_nav" style="display:none;"><a href="#call">Call</a></div>
@@ -22,7 +20,13 @@
 				<?php	}	?>
 				<div id="settings_nav"><a href="#settings">Settings</a></div>
 				<div id="logout_nav"><a id="logout_button" href="logout">Logout</a></div>
-				<div id="nav_button_block"><a id="nav_button" href="javascript:void(0)" onclick="nav_responsive();"><i class="fa fa-bars"></i></a></div>
+				<div id="nav_button_block">
+					<a id="nav_button" href="javascript:void(0)" onclick="nav_responsive();">
+						<svg style="width: 1em; height: 1em; vertical-align: -.125em;" viewBox="0 0 448 512">
+							<path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path>
+						</svg>
+					</a>
+				</div>
 			</nav>
 		</header>
 		<main>
@@ -74,11 +78,19 @@
 				</div>
 				<div class="flex align_flex_end" id="middle_block">
 					<div class="flex">
-						<button id="mute_button" class="unmuted"><i class="fas fa-microphone-slash responsive_icon"></i><br>mute</button>
+						<button id="mute_button" class="unmuted">
+							<svg style="width: 1.25em; height: 1em; vertical-align: -.125em; font-size: 30px;" viewBox="0 0 640 512">
+								<path fill="currentColor" d="M633.82 458.1l-157.8-121.96C488.61 312.13 496 285.01 496 256v-48c0-8.84-7.16-16-16-16h-16c-8.84 0-16 7.16-16 16v48c0 17.92-3.96 34.8-10.72 50.2l-26.55-20.52c3.1-9.4 5.28-19.22 5.28-29.67V96c0-53.02-42.98-96-96-96s-96 42.98-96 96v45.36L45.47 3.37C38.49-2.05 28.43-.8 23.01 6.18L3.37 31.45C-2.05 38.42-.8 48.47 6.18 53.9l588.36 454.73c6.98 5.43 17.03 4.17 22.46-2.81l19.64-25.27c5.41-6.97 4.16-17.02-2.82-22.45zM400 464h-56v-33.77c11.66-1.6 22.85-4.54 33.67-8.31l-50.11-38.73c-6.71.4-13.41.87-20.35.2-55.85-5.45-98.74-48.63-111.18-101.85L144 241.31v6.85c0 89.64 63.97 169.55 152 181.69V464h-56c-8.84 0-16 7.16-16 16v16c0 8.84 7.16 16 16 16h160c8.84 0 16-7.16 16-16v-16c0-8.84-7.16-16-16-16z"></path>
+							</svg><br>mute
+						</button>
 					</div>
 				</div>
 				<div class="flex">
-					<button id="hangup_button" class="round_button"><i class="fas fa-phone responsive_icon"></i></button>
+					<button id="hangup_button" class="round_button">
+						<svg style="width: 1em; height: 1em; vertical-align: -.125em; font-size: 30px;" viewBox="0 0 512 512">
+							<path fill="currentColor" d="M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"></path>
+						</svg>
+					</button>
 				</div>
 			</div>
 			<div id="admin_container" class="main_container" style="display:none;">
@@ -88,366 +100,7 @@
 		<audio autoplay></audio>
 		<script>
 			<?php	require_once(__DIR__."/../essentials/iceservers.php");	?>
-			var rtc_connection;
-			var candidates;
-			var localStream;
-			var remoteStream;
-			var ids_order = [];
-
-			function ajax(url, method, body){
-				return new Promise((resolve, reject) => {
-					$.ajax({
-						method: method,
-						url: url,
-						data: body
-					}).done(data => {
-						resolve(data);
-					}).fail(() => {
-						setTimeout(() => {resolve(ajax(url, method, body))}, 1000);
-					})
-				})
-			}
-
-			const navs = ["call", "dispatch", "admin", "settings"];
-			var hangup_sound = new Audio("static/hangup.opus");
-
-			function nav_responsive(responsive = null) {
-				var main = document.querySelector("main");
-				var header = document.querySelector("header");
-				var nav = document.querySelector("nav");
-				if(responsive === null){
-					responsive = !nav.classList.contains("responsive_nav");
-				}
-				if(!responsive){
-					main.classList.remove("responsive_main");
-					header.classList.remove("responsive_header");
-					nav.classList.remove("responsive_nav");
-				}else{
-					main.classList.add("responsive_main");
-					header.classList.add("responsive_header");
-					nav.classList.add("responsive_nav");
-				}
-			}
-			document.querySelector("#change_password_form").onsubmit = event => {
-				var password = document.querySelector("input[name=new_pass]").value;
-				var password_confirm = document.querySelector("input[name=new_pass_confirm]").value;
-				if (password != password_confirm) {
-					alert("Password confim must be the same as Password");
-					return false;
-				}
-			}
-
-			function update_nav(event = null){
-				if(window.location.hash){
-					var hash = window.location.hash.substring(1);
-					if(navs.includes(hash)){
-						navs.forEach(nav => {
-							document.querySelector("#"+nav+"_container").style.display = "none";
-						});
-						if(!document.querySelector("#"+hash+"_nav") || document.querySelector("#"+hash+"_nav").style.display == "none"){
-							window.location.href = "#dispatch";
-							return;
-						}
-
-						document.querySelector("#"+hash+"_container").style.display = "";
-
-					}else{
-						window.location.hash = "#dispatch";
-					}
-				}else{
-					window.location.hash = "#dispatch";
-				}
-				nav_responsive(false);
-			}
-
-			async function check_calls_thread(){
-				var calls = JSON.parse(await ajax("api/receive_calls", "GET"));
-				var s_table = document.querySelector("#dispatch_table");
-				var table_html = `
-					<div class="s-table_row s-table_header" style="padding: 15px 0;">
-						<div class="s-table_item">Dispatches</div>
-						<div class="s-table_footer">
-						</div>
-					</div>
-				`;
-				var new_ids_order = [];
-
-				calls.forEach(call => {
-					var type = "";
-					if(call["type"] == "POLICE"){
-						type = "Police";
-					}else if(call["type"] == "AMBULANCE"){
-						type = "Ambulance";
-					}else{
-						type = "Fire Service";
-					}
-
-					var location_column = "";
-
-					if(call["location"]){
-						location_column = `
-							<div class="s-table_item">
-								<div>Location</div>
-								<div>${call["location"]}</div>
-							</div>
-						`;
-					}
-
-					table_html += `
-					<div class="s-table_row">
-						<div class="s-table_item">
-							<div>Type</div>
-							<div>${type}</div>
-						</div>
-						<div class="s-table_item">
-							<div>IP</div>
-							<div>${call["caller_ip"]}</div>
-						</div>
-						<div class="s-table_item">
-							<div>Time</div>
-							<div>${call["date"]}</div>
-						</div>${location_column}
-						<div class="s-table_footer">
-							<a class="positive_button" href="#" onclick="answerCall('${call["id"]}');">Accept</a>
-							<a class="negative_button" href="#" onclick="denyCall('${call["id"]}');">Deny</a>
-						</div>
-					</div>
-					`;
-					new_ids_order[call["id"]] = JSON.parse(call["offer"]);
-				});
-				if(s_table.innerHTML.replaceAll("\n","").replaceAll("\r","").replaceAll(" ","").replaceAll("\t","").replaceAll("'","\"").replaceAll("=","").replaceAll("\"", "").toLowerCase() != table_html.replaceAll("\n","").replaceAll("\r","").replaceAll(" ","").replaceAll("\t","").replaceAll("'","\"").replaceAll("=","").replaceAll("\"", "").toLowerCase()){
-					s_table.innerHTML = table_html;
-					ids_order = new_ids_order;
-				}
-				setTimeout(() => {check_calls_thread();}, 1000);
-			}
-
-			async function wait_for_candidates(){
-				return new Promise(async (resolve, reject) => {
-					var response = await ajax("api/receive_candidates", "POST", {});
-
-					if(response === "waiting"){
-						setTimeout(() => {resolve(wait_for_candidates())}, 400);
-					}else{
-						resolve(response);
-					}
-				});
-			}
-
-			function createMediaStream(){
-				return new Promise((resolve, reject) => {
-					navigator.mediaDevices.getUserMedia({<?php	require_once(__DIR__."/../essentials/mediaproperties.php");	?>}).then(stream => {
-						resolve(stream);
-					}).catch(error => {
-						reject(error);
-					});
-				});
-			}
-
-			function denyCall(id){
-				if(rtc_connection){
-					alert("You can't deny a call while in a call.");
-					return;
-				}
-
-				ajax("api/close_call.php", "POST", {
-					"id": id
-				});
-			}
-
-			async function answerCall(id){
-				if(rtc_connection){
-					alert("You can't answer a call while in a call.");
-					return;
-				}
-
-				rtc_connection = new RTCPeerConnection(configuration);
-
-				try{
-					localStream = await createMediaStream();
-					localStream.getTracks().forEach(track => rtc_connection.addTrack(track, localStream));
-				}catch{
-					alert("You must enable microphone access in order to call.");
-					return;
-				}
-
-				var call_header = document.querySelector("#inside_header");
-
-				call_header.innerHtml = "Connecting...";
-				document.querySelector("#call_nav").style.display = "";
-				window.location.hash = "#call";
-
-				candidates = [];
-
-				remoteStream = new MediaStream();
-				document.querySelector("audio").srcObject = remoteStream;
-
-				rtc_connection.addEventListener('track', async (event) => {
-					remoteStream.addTrack(event.track, remoteStream);
-				});
-
-				rtc_connection.onicecandidate = async (event) => {
-					candidates.push(event.candidate);
-				}
-
-				try{
-					rtc_connection.setRemoteDescription(ids_order[id]);
-				}catch{
-					disconnectCall("Got invalid data");
-					return;
-				}
-
-				var rtc_answer = await rtc_connection.createAnswer();
-
-				await rtc_connection.setLocalDescription(rtc_answer);
-
-				var response = await ajax("api/accept_call.php", "POST", {
-					"id": id,
-					"answer": JSON.stringify(rtc_answer)
-				});
-
-				if(response != "true"){
-					disconnectCall("Failed to connect");
-					return;
-				}
-
-				call_header.innerHTML = "Exchanging";
-
-				var receivecandidates_response = await wait_for_candidates();
-
-				if(receivecandidates_response == "false"){
-					disconnectCall("Exchange failed");
-					return;
-				}
-
-				try{
-					var caller_candidates = JSON.parse(receivecandidates_response);
-
-					caller_candidates.forEach(candidate => {
-						rtc_connection.addIceCandidate(candidate);
-					});
-				}catch{
-					disconnectCall("Got invalid data");
-					return;
-				}
-
-				async function send_candidates(){
-					if(candidates.length > 0 && (
-							candidates[candidates.length - 1] === null ||
-							rtc_connection.iceConnectionState == "completed" ||
-							rtc_connection.iceConnectionState == "connected" ||
-							rtc_connection.iceGatheringState == "complete")
-					){
-						candidates.splice(candidates.length-1,1);
-						var sendcandidates_response = await ajax("api/send_candidates", "POST", {
-							candidates: JSON.stringify(candidates)
-						});
-
-						if(sendcandidates_response == "true"){
-							function checkStatus(disconnect_timeout){
-								if(rtc_connection.iceConnectionState == "connected" && !isConnectedStyle()){
-									call_header.innerHTML = "Emergency call";
-									connectedCallStyle();
-								}else if(disconnect_timeout >= 20){
-									disconnectCall("Connection lost")
-								}else if(
-									rtc_connection.iceConnectionState == "disconnected" ||
-									rtc_connection.iceConnectionState == "failed"
-								){
-									call_header.innerHTML = "Reconnecting";
-									disconnect_timeout += 1;
-								}else if(
-									rtc_connection.iceConnectionState == "connecting" ||
-									rtc_connection.iceConnectionState == "connected"
-								){
-									call_header.innerHTML = "Emergency call";
-									disconnect_timeout = 0;
-								}
-
-
-								if(rtc_connection && rtc_connection.iceConnectionState != "closed"){
-									setTimeout(() => {
-										checkStatus(disconnect_timeout);
-									}, 500);
-								}
-							}
-
-							call_header.innerHTML = "Connecting";
-							checkStatus(0);
-						}else{
-							disconnectCall("Exchanging failed");
-							return;
-						}
-					}else{
-						setTimeout(() => {
-							send_candidates()
-						}, 1000);
-					}
-				}
-
-				send_candidates();
-			}
-
-			document.querySelector("#hangup_button").onclick = event => {disconnectCall();}
-
-			document.querySelector("#mute_button").onclick = event => {
-				if(localStream){
-					if(localStream.getTracks()[0].enabled){
-						localStream.getTracks()[0].enabled = false;
-						document.querySelector("#mute_button").classList.add("muted");
-						document.querySelector("#mute_button").classList.remove("unmuted");
-					}else{
-						localStream.getTracks()[0].enabled = true;
-						document.querySelector("#mute_button").classList.remove("muted");
-						document.querySelector("#mute_button").classList.add("unmuted");
-					}
-				}
-			}
-
-			function connectedCallStyle(){
-				document.querySelector("body").style.background = "linear-gradient(45deg, rgba(234,155,73,1) 0%, rgba(32,124,229,1) 100%)";
-			}
-
-			function isConnectedStyle(){
-				return (document.querySelector("body").style.background == "linear-gradient(45deg, rgba(234,155,73,1) 0%, rgba(32,124,229,1) 100%)");
-			}
-
-			function disconnectCall(message = "Disconnected"){
-				var call_header = document.querySelector("#inside_header");
-				
-				if(call_header.innerHTML != "Disconnected"){
-					call_header.innerHTML = message;
-					hangup_sound.play();
-				}
-				
-				ajax("api/close_call.php", "POST", {});
-				setTimeout(() => {
-					call_header.innerHTML = "Emergency Services";
-					document.querySelector("#mute_button").classList.remove("muted");
-					document.querySelector("#mute_button").classList.add("unmuted");
-					document.querySelector("#call_nav").style.display = "none";
-					document.querySelector("body").style.background = "linear-gradient(to bottom,rgba(42, 94, 232, 0.75) 0%,rgba(42, 94, 232, 1) 60%)";
-					window.location.hash = "#dispatch";
-				}, 2000);
-				if(rtc_connection){
-					rtc_connection.close();
-					rtc_connection = null;
-				}
-				if(localStream){
-					localStream.getTracks().forEach(function(track) {
-						track.stop();
-					});
-				}
-				if(remoteStream){
-					remoteStream.getTracks().forEach(function(track) {
-						track.stop();
-					});
-				}
-			}
-
-			window.onhashchange = update_nav;
-			check_calls_thread();
-			update_nav();
+			<?php	require_once(__DIR__."/panel.js");	?>
 			<?php if (isset($site_params["error"])) {echo ("alert(\"" . $site_params["error"] . "\");");}	?>
 		</script>
 	</body>

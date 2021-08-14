@@ -10,7 +10,7 @@
 			session_destroy();
 			Website::deploy("index");
 		}
-		
+
 		Website::deploy("panel");
 	}
 

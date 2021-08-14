@@ -18,12 +18,13 @@
 			}
 		</style>
 	</head>
+	
 	<body>
 		<div id="root">
-			<header>Police Dispatch Register</header>
+			<header>Dispolatcher Register</header>
 			<main>
 				<form method="POST" class="container flex flex_column">
-					<img style="width:70px;" src="static/logo.svg" alt="">
+					<img style="width:70px;" src="static/logo.svg" alt="logo">
 					<input class="container_part" type="email" autocomplete="off" maxlength="42" name="email" pattern="^[a-zA-Z0-9,.-_]{2,15}@[a-zA-Z0-9,.-_]{2,15}\.[a-zA-Z]{2,10}$" title="Email can only contain english letters, comma, dash and underscore" placeholder="Email" required>
 					<input class="container_part" type="email" autocomplete="off" maxlength="42" name="email_confirm" pattern="^[a-zA-Z0-9,.-_]{2,15}@[a-zA-Z0-9,.-_]{2,15}\.[a-zA-Z]{2,10}$" title="Email can only contain english letters, comma, dash and underscore" placeholder="Email confirm" required>
 					<input class="container_part" type="password" autocomplete="off" maxlength="100" pattern="^.{6,100}$" name="pass" title="Password must have a length between 6 and 100." placeholder="Password" required>
@@ -40,11 +41,11 @@
 			<script>
 				<?php	if( isset($site_params["error"]) ){ echo sprintf("alert('%s');", $site_params["error"]); }	?>
 				document.querySelector("form").onsubmit = event => {
-					var email = document.querySelector("input[name=email]").value;
-					var email_confirm = document.querySelector("input[name=email_confirm]").value;
+					let email = document.querySelector("input[name=email]").value;
+					let email_confirm = document.querySelector("input[name=email_confirm]").value;
 
-					var password = document.querySelector("input[name=pass]").value;
-					var password_confirm = document.querySelector("input[name=pass_confirm]").value;
+					let password = document.querySelector("input[name=pass]").value;
+					let password_confirm = document.querySelector("input[name=pass_confirm]").value;
 
 					if(email != email_confirm){
 						alert("Email confim must be the same as Email");

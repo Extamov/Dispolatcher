@@ -2,9 +2,11 @@
 
 ## Description
 
-A system for police dispatchers based on WEB and backended by PHP on Apache web server.
+Dispolatcher is a web system made for emergency dispatch.
 
-The system contains 2 parts, 1 for a caller to call and one for the dispatcher to answer.
+The system contains 2 parts, one for a caller to call and one for the dispatcher to answer.
+
+The system is built on PHP for server side, MySQL for the database and WEB for the client side.
 
 ## Requirements
 
