@@ -1,0 +1,14 @@
+{
+	"name": "extamov/dispolatcher",
+	"description": "A web system made for emergency dispatch.",
+	"authors": [
+		{
+			"name": "Extamov",
+			"email": "extamov@gmail.com"
+		}
+	],
+	"license": "GPL-3.0-only",
+	"require": {
+		"phpmailer/phpmailer": "^6.5"
+	}
+}
